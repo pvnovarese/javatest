@@ -22,7 +22,7 @@ pipeline {
     // api endpoint of your anchore instance
     // ANCHORE_URL = "http://anchore3-priv.novarese.net:8228/v1"
     //
-} // end environment 
+  } // end environment 
   
   agent any
   
@@ -46,30 +46,28 @@ pipeline {
     stage('Analyze Image with Anchore plugin') {
       steps {
         writeFile file: 'anchore_images', text: IMAGELINE
-        script {
-          try {
-            // forceAnalyze is a good idea since we're passing a Dockerfile with the image
-            anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
-            //
-            // if we want to use anchore-cli instead we can do this:
-            //sh """
-            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image add --force --dockerfile Dockerfile-1 --noautosubscribe ${REPOSITORY}:${TAG1}
-            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image wait ${REPOSITORY}:${TAG1}
-            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} evaluate check ${REPOSITORY}:${TAG1}
-            //"""
-            // 
-          } catch (err) {
-            // if scan fails, clean up (delete the image) and fail the build
-            sh """
-              docker rmi ${REPOSITORY}:${TAG}
-              exit 1
-            """
-            // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
-            // and generate the report:
-            //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
-            //
-          } // end try
-        } // end script 
+        try {
+          // forceAnalyze is a good idea since we're passing a Dockerfile with the image
+          anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+          //
+          // if we want to use anchore-cli instead we can do this:
+          //sh """
+          //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image add --force --dockerfile Dockerfile-1 --noautosubscribe ${REPOSITORY}:${TAG1}
+          //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image wait ${REPOSITORY}:${TAG1}
+          //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} evaluate check ${REPOSITORY}:${TAG1}
+          //"""
+          // 
+        } catch (err) {
+          // if scan fails, clean up (delete the image) and fail the buil
+          sh """
+            docker rmi ${REPOSITORY}:${TAG}
+            exit 1
+          """
+          // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
+          // and generate the report:
+          //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+          //
+        } // end try
       } // end steps
     } // end stage "analyze image 1 with anchore plugin"        
     
@@ -86,5 +84,7 @@ pipeline {
         //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'        
       } // end steps
     } // end stage "clean up"
+    
   } // end stages
+  
 } // end pipeline 
