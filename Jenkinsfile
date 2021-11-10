@@ -2,14 +2,17 @@
 
 pipeline {
   environment {
+    //
     // "REGISTRY" isn't required if we're using docker hub, I'm leaving it here in case you want to use a different registry
     // REGISTRY = 'registry.hub.docker.com'
+    //
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     CREDENTIAL = "docker-hub"
     DOCKER_HUB = credentials("$CREDENTIAL")
     REPOSITORY = "${DOCKER_HUB_USR}/2021-november-enterprise-demo"
     TAG = "build-${BUILD_NUMBER}"
     IMAGELINE = "${REPOSITORY}:${TAG} Dockerfile"
+    //
     // we will need these if we're using anchore-cli
     // we'll need the anchore credential to pass the user
     // and password to anchore-cli so it can upload the results
@@ -18,20 +21,23 @@ pipeline {
     // ANCHORE = credentials("${ANCHORE_CREDENTIAL}")
     // api endpoint of your anchore instance
     // ANCHORE_URL = "http://anchore3-priv.novarese.net:8228/v1"
-
+    //
 } // end environment 
+  
   agent any
+  
   stages {
     stage('Checkout SCM') {
       steps {
         checkout scm
       } // end steps
     } // end stage "checkout scm"
+    
     stage('Build and Push Image') {
       steps {
         sh """
           docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSW}
-          docker build -t ${REPOSITORY}:${TAG} -f ./Dockerfile .
+          docker build -t ${REPOSITORY}:${TAG} --pull -f ./Dockerfile .
           docker push ${REPOSITORY}:${TAG}
         """
       } // end steps
@@ -61,6 +67,7 @@ pipeline {
             // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
             // and generate the report:
             //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+            //
           } // end try
         } // end script 
       } // end steps
@@ -69,7 +76,11 @@ pipeline {
     stage('Clean up') {
       // if we succuessfully evaluated the image with a PASS than we don't need the $BUILD_ID tag anymore
       steps {
-        sh 'docker rmi ${REPOSITORY}:${TAG1}'
+        // if we want to promote the image, this would be a good spot to do it.
+        //
+        // don't need the image anymore so let's rm it
+        sh 'docker image rm ${REPOSITORY}:${TAG}'
+        //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
         //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'        
