@@ -29,13 +29,11 @@ pipeline {
     } // end stage "checkout scm"
     stage('Build and Push Image') {
       steps {
-        script {
-          sh """
-            docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSW}
-            docker build -t ${REPOSITORY}:${TAG} -f ./Dockerfile .
-            docker push ${REPOSITORY}:${TAG}
-          """
-        } // end script
+        sh """
+          docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSW}
+          docker build -t ${REPOSITORY}:${TAG} -f ./Dockerfile .
+          docker push ${REPOSITORY}:${TAG}
+        """
       } // end steps
     } // end stage "build image and push to registry"
     
