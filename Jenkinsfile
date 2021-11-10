@@ -10,6 +10,15 @@ pipeline {
     REPOSITORY = "${DOCKER_HUB_USR}/2021-november-enterprise-demo"
     TAG = "build-${BUILD_NUMBER}"
     IMAGELINE = "${REPOSITORY}:${TAG} Dockerfile"
+    // we will need these if we're using anchore-cli
+    // we'll need the anchore credential to pass the user
+    // and password to anchore-cli so it can upload the results
+    // ANCHORE_CREDENTIAL = "AnchoreJenkinsUser"
+    // use credentials to set ANCHORE_USR and ANCHORE_PSW
+    // ANCHORE = credentials("${ANCHORE_CREDENTIAL}")
+    // api endpoint of your anchore instance
+    // ANCHORE_URL = "http://anchore3-priv.novarese.net:8228/v1"
+
 } // end environment 
   agent any
   stages {
@@ -29,6 +38,7 @@ pipeline {
         } // end script
       } // end steps
     } // end stage "build image and push to registry"
+    
     stage('Analyze Image with Anchore plugin') {
       steps {
         writeFile file: 'anchore_images', text: IMAGELINE
@@ -36,18 +46,35 @@ pipeline {
           try {
             // forceAnalyze is a good idea since we're passing a Dockerfile with the image
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
+            //
+            // if we want to use anchore-cli instead we can do this:
+            //sh """
+            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image add --force --dockerfile Dockerfile-1 --noautosubscribe ${REPOSITORY}:${TAG1}
+            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image wait ${REPOSITORY}:${TAG1}
+            //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} evaluate check ${REPOSITORY}:${TAG1}
+            //"""
+            // 
           } catch (err) {
             // if scan fails, clean up (delete the image) and fail the build
-            sh 'docker rmi ${REPOSITORY}:${TAG}'
-            sh 'exit 1'
+            sh """
+              docker rmi ${REPOSITORY}:${TAG}
+              exit 1
+            """
+            // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
+            // and generate the report:
+            //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
           } // end try
         } // end script 
       } // end steps
     } // end stage "analyze image 1 with anchore plugin"        
+    
     stage('Clean up') {
       // if we succuessfully evaluated the image with a PASS than we don't need the $BUILD_ID tag anymore
       steps {
         sh 'docker rmi ${REPOSITORY}:${TAG1}'
+        // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
+        // and generate the report:
+        //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'        
       } // end steps
     } // end stage "clean up"
   } // end stages
