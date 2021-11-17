@@ -1,5 +1,3 @@
-// anchore plugin for jenkins: https://www.jenkins.io/doc/pipeline/steps/anchore-container-scanner/
-
 pipeline {
   environment {
     //
@@ -48,6 +46,9 @@ pipeline {
         writeFile file: 'anchore_images', text: IMAGELINE
         script {
           try {
+            //
+            // anchore plugin for jenkins: https://www.jenkins.io/doc/pipeline/steps/anchore-container-scanner/
+            //
             // forceAnalyze is a good idea since we're passing a Dockerfile with the image
             anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
             //
