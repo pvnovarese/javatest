@@ -1,8 +1,13 @@
-	{
-	    "name": "sudo",
-	    "version": "1.8.29-5.el8",
-	    "origin": "CentOS",
-	    "license": "ISC",
-	    "size": "3555802",
-	    "type": "rpm"
-	}
+
+{
+        "packages": [
+                {
+			"name": "sudo",
+			"version": "1.8.29-5.el8",
+			"origin": "CentOS",
+			"license": "ISC",
+			"size": "3555802",
+			"type": "rpm"
+                }
+        ]
+}
