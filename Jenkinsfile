@@ -25,11 +25,23 @@ pipeline {
   agent any
   
   stages {
+    
     stage('Checkout SCM') {
       steps {
         checkout scm
       } // end steps
     } // end stage "checkout scm"
+    
+    stage('Verify Tools') {
+      steps {
+        sh """
+          which docker
+          which anchore-cli
+          which /var/jenkins_home/anchorectl
+          """
+      } // end steps
+    } // end stage "Verify Tools"
+
     
     stage('Build and Push Image') {
       steps {
@@ -39,46 +51,40 @@ pipeline {
           docker push ${REPOSITORY}:${TAG}
         """
       } // end steps
-    } // end stage "build image and push to registry"
+    } // end stage "build and push"
     
     stage('Analyze Image with Anchore plugin') {
       steps {
+        // anchore plugin for jenkins: https://www.jenkins.io/doc/pipeline/steps/anchore-container-scanner/
+        // first, we need to write out the "anchore_images" file which is what the plugin reads to know
+        // which images to scan:
         writeFile file: 'anchore_images', text: IMAGELINE
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+        // call the scanner, wrapin catchError so we can break the pipeline but still run the
+        // cleanup stage if the evaluation fails
+        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+          // forceAnalyze is a good idea since we're passing a Dockerfile with the image
           anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
         }
-        //script {
-        //  try {
-        //    //
-        //    // anchore plugin for jenkins: https://www.jenkins.io/doc/pipeline/steps/anchore-container-scanner/
-        //   //
-        //    // forceAnalyze is a good idea since we're passing a Dockerfile with the image
-        //    anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
-        //    //
-        //    // if we want to use anchore-cli instead we can do this:
-        //    //sh """
-        //    //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image add --force --dockerfile Dockerfile-1 --noautosubscribe ${REPOSITORY}:${TAG1}
-        //    //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image wait ${REPOSITORY}:${TAG1}
-        //    //  anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} evaluate check ${REPOSITORY}:${TAG1}
-        //    //"""
-        //    // 
-        //  } catch (err) {
-        //    // if scan fails, clean up (delete the image) 
-        //    // tar up the json files, and fail the build
-        //    sh """
-        //      docker rmi ${REPOSITORY}:${TAG}
-        //      tar -czf reports.tgz anchore-reports/*.json
-        //      archiveArtifacts artifacts: 'reports.tgz', fingerprint: true
-        //      exit 1
-        //    """
-        //    // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
-        //    // and generate the report:
-        //    //anchore name: 'anchore_images', forceAnalyze: 'true', engineRetries: '900'
-        //    //
-        //  } // end try
-        //} // end script
+        // if we want to use anchore-cli instead we can do this:
+        // sh """
+        //   anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image add --force --dockerfile Dockerfile-1 --noautosubscribe ${REPOSITORY}:${TAG1}
+        //   anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} image wait ${REPOSITORY}:${TAG1}
+        //   anchore-cli --url ${ANCHORE_URL} --u ${ANCHORE_USR} --p ${ANCHORE_PSW} evaluate check ${REPOSITORY}:${TAG1}
+        // """
+        //
       } // end steps
-    } // end stage "analyze image 1 with anchore plugin"        
+    } // end stage "analyze image 1 with anchore plugin"     
+    
+    // optional, you could promote the image here but I need to figure out how
+    // to skip this stage if the eval failed since I'm using catchError
+    // stage('Promote Image') {
+    //   steps {
+    //     sh """
+    //       docker tag
+    //       docker push
+    //     """
+    //   } // end steps
+    // } // end stage "Promote Image"        
     
     stage('Clean up') {
       // if we succuessfully evaluated the image with a PASS than we don't need the $BUILD_ID tag anymore
