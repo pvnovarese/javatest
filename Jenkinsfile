@@ -80,7 +80,11 @@ pipeline {
         // if we want to promote the image, this would be a good spot to do it.
         //
         // don't need the image anymore so let's rm it
-        sh 'docker image rm ${REPOSITORY}:${TAG}'
+        sh """
+          docker image rm ${REPOSITORY}:${TAG}
+          tar -czf reports.tgz anchore-reports/*.json
+          archiveArtifacts artifacts: 'reports.tgz', fingerprint: true
+        """
         //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
