@@ -88,11 +88,7 @@ pipeline {
         // don't need the image anymore so let's rm it
         //
         // also let's tar up the generated json and archive it.
-        sh """
-          docker image rm ${REPOSITORY}:${TAG}
-          tar -czf reports.tgz anchore-reports/*.json
-          archiveArtifacts artifacts: 'reports.tgz', fingerprint: true
-        """
+        sh 'docker image rm ${REPOSITORY}:${TAG}'
         //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
