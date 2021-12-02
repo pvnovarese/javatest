@@ -60,9 +60,12 @@ pipeline {
             //"""
             // 
           } catch (err) {
-            // if scan fails, clean up (delete the image) and fail the buil
+            // if scan fails, clean up (delete the image) 
+            // tar up the json files, and fail the build
             sh """
               docker rmi ${REPOSITORY}:${TAG}
+              tar -czf reports.tgz anchore-reports/*.json
+              archiveArtifacts artifacts: 'reports.tgz', fingerprint: true
               exit 1
             """
             // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
@@ -80,6 +83,8 @@ pipeline {
         // if we want to promote the image, this would be a good spot to do it.
         //
         // don't need the image anymore so let's rm it
+        //
+        // also let's tar up the generated json and archive it.
         sh """
           docker image rm ${REPOSITORY}:${TAG}
           tar -czf reports.tgz anchore-reports/*.json
