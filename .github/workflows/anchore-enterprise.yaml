@@ -20,11 +20,6 @@ on:
 jobs:
   Build-Push:
     runs-on: ubuntu-latest
-    env:
-      ANCHORE_CLI_USER: ${{ secrets.ANCHORE_CLI_USER }}
-      ANCHORE_CLI_PASS: ${{ secrets.ANCHORE_CLI_PASS }}
-      ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }}
-#      IMAGE: ghcr.io/${GITHUB_REPOSITORY}:${GITHUB_SHA}
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2
@@ -53,9 +48,6 @@ jobs:
     - name: Wait for Enterprise Analysis
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
-    - name: Check Evaluation
-      run: |
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
         
   Promote:
     needs: Enterprise-Queue
