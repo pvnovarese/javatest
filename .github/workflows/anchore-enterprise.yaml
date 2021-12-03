@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: debug check
-      run: echo github_ref: ${GITHUB_REF} github_ref_name: ${GITHUB_REF_NAME}
+      run: echo "github_ref: ${GITHUB_REF} github_ref_name: ${GITHUB_REF_NAME}"
     - name: Login to ghcr.io
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
     - name: Tag image as production
