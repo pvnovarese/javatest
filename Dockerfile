@@ -18,7 +18,9 @@ RUN set -ex && \
     yum -y install ruby python3-devel python3 python3-pip nodejs && \
     pip3 install --index-url https://pypi.org/simple --no-cache-dir aiohttp==3.7.3 pytest urllib3 botocore six numpy && \
     gem install ftpd -v 0.2.1 && \
-    npm install xmldom@0.4.0 && \
+    npm install --cache /tmp/empty-cache xmldom@0.4.0 && \
+    rm -rf /tmp/empty-cache && \
+    npm cache clean --force && \
     yum remove ruby python3-devel python3-pip python3 nodejs -y && \
     yum autoremove -y && \
     yum clean all && \    
