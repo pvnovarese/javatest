@@ -13,11 +13,9 @@ on:
     branches:
       - main
 
-#workflow environment
-#env:
-#  IMAGE: ghcr.io/${{ GITHUB_REPOSITORY }}:${{ GITHUB_SHA }}
   
 jobs:
+
   Build-Push:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +46,10 @@ jobs:
     - name: Wait for Enterprise Analysis
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+    - name: Check Evaluation
+      run: |
+        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+
         
   Promote:
     needs: Enterprise-Queue
