@@ -45,6 +45,8 @@ jobs:
       ANCHORE_CLI_PASS: ${{ secrets.ANCHORE_CLI_PASS }}
       ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }}
     steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
     - name: Add to Enterprise Queue
       run: | 
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL --mount type=bind,src=${PWD}/Dockerfile,dst=/Dockerfile anchore/engine-cli anchore-cli image add --noautosubscribe --dockerfile /Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
