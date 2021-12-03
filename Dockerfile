@@ -12,7 +12,6 @@ LABEL org.opencontainers.image.description="Simple image to test various policy 
 COPY Dockerfile anchore_hints.json ./
 
 RUN set -ex && \
-    date > /image_build_timestamp && \
     adduser -d /xmrig mining && \
     echo "aws_access_key_id=01234567890123456789" > /aws_access && \
     echo "-----BEGIN OPENSSH PRIVATE KEY-----" > /ssh_key && \
@@ -30,8 +29,11 @@ RUN set -ex && \
 ##    rm -rf /sudo-1.8.29-5.el8.x86_64.rpm && \    
 
 COPY --from=xmrig /xmrig/xmrig /xmrig/xmrig
+HEALTHCHECK --timeout=10s CMD /bin/true || exit 1
+
+## just to make sure we have a unique build each time
+RUN date > /image_build_timestamp
 
 USER mining
 WORKDIR /xmrig
-HEALTHCHECK --timeout=10s CMD /bin/true || exit 1
 ENTRYPOINT /bin/false
