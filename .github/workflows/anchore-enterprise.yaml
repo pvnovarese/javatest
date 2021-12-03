@@ -31,9 +31,9 @@ jobs:
     - name: Debug Check
       run: |
         echo "${{ github.workspace }}"
-        echo "${github.workspace%/*}"
         echo "${PWD}"
         ls -lR ${{ github.workspace }}
+        ls -lR ${PWD}
         ls -lR ${github.workspace%/*}
         exit 1
     - name: Login to ghcr.io
