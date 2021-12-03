@@ -31,7 +31,10 @@ jobs:
     - name: Debug Check
       run: |
         echo "${{ github.workspace }}"
-        echo "${pwd}"
+        echo "${github.workspace%/*}"
+        echo "${PWD}"
+        ls -lR ${{ github.workspace }}
+        ls -lR ${github.workspace%/*}
         exit 1
     - name: Login to ghcr.io
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
