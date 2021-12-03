@@ -47,23 +47,23 @@ jobs:
     steps:
     - name: Add to Enterprise Queue
       run: | 
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL --mount type=bind,src=${pwd}/Dockerfile,dst=/Dockerfile anchore/engine-cli anchore-cli image add --noautosubscribe --dockerfile /Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL --mount type=bind,src=./Dockerfile,dst=/Dockerfile anchore/engine-cli anchore-cli image add --noautosubscribe --dockerfile /Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
     - name: Wait for Enterprise Analysis
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
     - name: Check Evaluation
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        
   Promote:
+    needs: Enterprise-Queue
     runs-on: ubuntu-latest
     steps:
-    - name: debug check
-      run: echo "${GITHUB_REF} ${GITHUB_REF_NAME}"
     - name: Login to ghcr.io
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
     - name: Tag image as production
       run: |
-        docker tag ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} ghcr.io/${GITHUB_REPOSITORY,,}:main
+        docker tag ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
     - name: Push Docker Image
       run: |
-        docker push ghcr.io/${GITHUB_REPOSITORY,,}:main
+        docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
