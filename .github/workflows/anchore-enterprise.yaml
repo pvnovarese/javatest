@@ -54,6 +54,10 @@ jobs:
   Promote:
     needs: Enterprise-Queue
     runs-on: ubuntu-latest
+    env:
+      ANCHORE_CLI_USER: ${{ secrets.ANCHORE_CLI_USER }}
+      ANCHORE_CLI_PASS: ${{ secrets.ANCHORE_CLI_PASS }}
+      ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }}
     steps:
     - name: Login to ghcr.io
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${GITHUB_ACTOR} --password-stdin
@@ -64,3 +68,8 @@ jobs:
     - name: Push Docker Image
       run: |
         docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+    - name: Add promoted image to Anchore queue
+      run: |
+        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image add --noautosubscribe ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+
