@@ -81,27 +81,20 @@ jobs:
         anchore-cli system status 
     - name: Pull Vulnerability List
       run: |
-        anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
-        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
-    - name: Archive Vulnerabilities
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: vulnerability-report
-        path: vuln.txt
-        retention-days: 14
+        anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee anchore-vuln.txt
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee anchore-vuln.txt
     - name: Pull Evaluation
       run: |
         set -o pipefail
         # we have to set pipefail so that we can still gate on the evaluation, otherwise piping into tee will mask the failure
-        anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
-        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
-    - name: Archive Evaluation
+        anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee anchore-evaluation.txt
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee anchore-evaluation.txt
+    - name: Archive Vulnerabilities and Evaluation
       if: always()
       uses: actions/upload-artifact@v2
       with:
         name: evaluation-report
-        path: evaluation.txt
+        path: anchore-*.txt
         retention-days: 14
         
   Promote-Deploy:
