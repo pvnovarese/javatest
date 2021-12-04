@@ -7,8 +7,8 @@ on:
   push:
     branches:
       - main
-#  schedule:
-#    - cron: '38 19 * * 6'
+  schedule:
+    - cron: '38 19 * * 6'
   workflow_dispatch:
     branches:
       - main
@@ -66,7 +66,7 @@ jobs:
         name: vulnerability-report
         path: vuln.txt
         retention-days: 14
-    - name: Check Evaluation
+    - name: Pull Evaluation
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
     - name: Archive Evaluation
@@ -76,6 +76,10 @@ jobs:
         name: evaluation-report
         path: evaluation.txt
         retention-days: 14
+    - name: Gate on Evaluation
+      run: |
+        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+
         
   Promote-Deploy:
     needs: Evaluate
