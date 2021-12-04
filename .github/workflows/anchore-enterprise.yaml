@@ -71,6 +71,11 @@ jobs:
       ANCHORE_CLI_PASS: ${{ secrets.ANCHORE_CLI_PASS }}
       ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }}
     steps:
+    - name: Install anchore-cli
+      run: |
+        #sudo apt-get install python3-pip
+        #pip install anchorecli
+        export PATH="$HOME/.local/bin/:$PATH"
     - name: Pull Vulnerability List
       run: |
         anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
