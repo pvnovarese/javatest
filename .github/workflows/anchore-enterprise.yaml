@@ -30,7 +30,7 @@ jobs:
       run: |
         docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}      
 
-  Enterprise-Queue:
+  Scan-Analyze:
     needs: Build-Push
     runs-on: ubuntu-latest
     env:
@@ -46,6 +46,16 @@ jobs:
     - name: Wait for Enterprise Analysis
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+
+
+  Evaluate:
+    needs: Scan-Analyze
+    runs-on: ubuntu-latest
+    env:
+      ANCHORE_CLI_USER: ${{ secrets.ANCHORE_CLI_USER }}
+      ANCHORE_CLI_PASS: ${{ secrets.ANCHORE_CLI_PASS }}
+      ANCHORE_CLI_URL: ${{ secrets.ANCHORE_CLI_URL }}
+    steps:
     - name: Pull Vulnerability List
       run: |
         docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
@@ -67,8 +77,8 @@ jobs:
         path: evaluation.txt
         retention-days: 14
         
-  Promote:
-    needs: Enterprise-Queue
+  Promote-Deploy:
+    needs: Evaluate
     runs-on: ubuntu-latest
     env:
       ANCHORE_CLI_USER: ${{ secrets.ANCHORE_CLI_USER }}
