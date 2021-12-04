@@ -30,11 +30,11 @@ jobs:
       run: |
         docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
     - name: Archive Dockerfile
-        uses: actions/upload-artifact@v2
-        with:
-          name: Dockerfile
-          path: Dockerfile
-          retention-days: 2
+      uses: actions/upload-artifact@v2
+      with:
+        name: Dockerfile
+        path: Dockerfile
+        retention-days: 2
 
   Scan-Analyze:
     needs: Build-Push
