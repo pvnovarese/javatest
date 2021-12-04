@@ -48,12 +48,19 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: Dockerfile
+    - name: Install anchore-cli
+      run: |
+        sudo apt-get install python3-pip
+        pip install anchorecli
+        export PATH="$HOME/.local/bin/:$PATH"
     - name: Add to Enterprise Queue
       run: | 
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL --mount type=bind,src=${PWD}/Dockerfile,dst=/Dockerfile anchore/engine-cli anchore-cli image add --noautosubscribe --dockerfile /Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        anchore-cli image add --noautosubscribe --dockerfile ./Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL --mount type=bind,src=${PWD}/Dockerfile,dst=/Dockerfile anchore/engine-cli anchore-cli image add --noautosubscribe --dockerfile /Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
     - name: Wait for Enterprise Analysis
       run: |
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
 
 
   Evaluate:
@@ -66,7 +73,8 @@ jobs:
     steps:
     - name: Pull Vulnerability List
       run: |
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
+        anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image vuln ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} all | tee vuln.txt
     - name: Archive Vulnerabilities
       if: always()
       uses: actions/upload-artifact@v2
@@ -78,7 +86,8 @@ jobs:
       run: |
         set -o pipefail
         # we have to set pipefail so that we can still gate on the evaluation, otherwise piping into tee will mask the failure
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
+        anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli evaluate check --detail ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA} | tee evaluation.txt
     - name: Archive Evaluation
       if: always()
       uses: actions/upload-artifact@v2
@@ -106,6 +115,8 @@ jobs:
         docker push ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
     - name: Add promoted image to Anchore queue
       run: |
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image add --noautosubscribe ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
-        docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+        anchore-cli image add --noautosubscribe ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+        anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image add --noautosubscribe ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
+        # docker run -e ANCHORE_CLI_USER -e ANCHORE_CLI_PASS -e ANCHORE_CLI_URL anchore/engine-cli anchore-cli image wait ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}
 
