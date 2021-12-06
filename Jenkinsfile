@@ -7,7 +7,7 @@ pipeline {
     // you need a credential named 'docker-hub' with your DockerID/password to push images
     CREDENTIAL = "docker-hub"
     DOCKER_HUB = credentials("$CREDENTIAL")
-    REPOSITORY = "${DOCKER_HUB_USR}/2021-november-enterprise-demo"
+    REPOSITORY = "${DOCKER_HUB_USR}/${JOB_BASE_NAME}"
     TAG = "build-${BUILD_NUMBER}"
     IMAGELINE = "${REPOSITORY}:${TAG} Dockerfile"
     //
