@@ -36,7 +36,6 @@ pipeline {
       steps {
         sh """
           which docker
-          echo ${GIT_BRANCH}
           #which anchore-cli
           #which /var/jenkins_home/anchorectl
           """
@@ -78,14 +77,14 @@ pipeline {
     
     // optional, you could promote the image here but I need to figure out how
     // to skip this stage if the eval failed since I'm using catchError
-    // stage('Promote Image') {
-    //   steps {
-    //     sh """
-    //       docker tag
-    //       docker push
-    //     """
-    //   } // end steps
-    // } // end stage "Promote Image"        
+    stage('Promote Image') {
+      steps {
+        sh """
+          docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:$(basename ${GIT_BRANCH})
+          docker push ${REPOSITORY}:$(basename ${GIT_BRANCH}
+        """
+      } // end steps
+    } // end stage "Promote Image"        
     
     stage('Clean up') {
       // if we succuessfully evaluated the image with a PASS than we don't need the $BUILD_ID tag anymore
@@ -95,7 +94,7 @@ pipeline {
         // don't need the image anymore so let's rm it
         //
         // also let's tar up the generated json and archive it.
-        sh 'docker image rm ${REPOSITORY}:${TAG}'
+        sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:$(basename ${GIT_BRANCH} || failure=1'
         //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
