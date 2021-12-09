@@ -81,7 +81,7 @@ pipeline {
       steps {
         sh """
           docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:$(basename ${GIT_BRANCH})
-          docker push ${REPOSITORY}:$(basename ${GIT_BRANCH}
+          docker push ${REPOSITORY}:$(basename ${GIT_BRANCH})
         """
       } // end steps
     } // end stage "Promote Image"        
