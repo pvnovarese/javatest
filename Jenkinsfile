@@ -36,7 +36,6 @@ pipeline {
       steps {
         sh """
           which docker
-          echo ${BRANCH_NAME}
           echo ${GIT_BRANCH}
           #which anchore-cli
           #which /var/jenkins_home/anchorectl
