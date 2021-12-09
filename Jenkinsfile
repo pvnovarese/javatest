@@ -36,8 +36,8 @@ pipeline {
       steps {
         sh """
           which docker
-          which anchore-cli
-          which /var/jenkins_home/anchorectl
+          #which anchore-cli
+          #which /var/jenkins_home/anchorectl
           """
       } // end steps
     } // end stage "Verify Tools"
