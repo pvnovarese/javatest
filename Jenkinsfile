@@ -10,6 +10,7 @@ pipeline {
     REPOSITORY = "${DOCKER_HUB_USR}/${JOB_BASE_NAME}"
     TAG = "build-${BUILD_NUMBER}"
     IMAGELINE = "${REPOSITORY}:${TAG} Dockerfile"
+    BRANCH_NAME = "${GIT_BRANCH.split("/")[1]}"
     //
     // we will need these if we're using anchore-cli
     // we'll need the anchore credential to pass the user
@@ -80,8 +81,8 @@ pipeline {
     stage('Promote Image') {
       steps {
         sh """
-          docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:$(basename ${GIT_BRANCH})
-          docker push ${REPOSITORY}:$(basename ${GIT_BRANCH})
+          docker tag ${REPOSITORY}:${TAG} ${REPOSITORY}:${BRANCH_NAME}
+          docker push ${REPOSITORY}:${BRANCH_NAME}
         """
       } // end steps
     } // end stage "Promote Image"        
@@ -94,7 +95,7 @@ pipeline {
         // don't need the image anymore so let's rm it
         //
         // also let's tar up the generated json and archive it.
-        sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:$(basename ${GIT_BRANCH} || failure=1'
+        sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:${BRANCH_NAME} || failure=1'
         //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
