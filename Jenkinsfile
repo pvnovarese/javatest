@@ -88,14 +88,14 @@ pipeline {
     } // end stage "Promote Image"        
     
     stage('Clean up') {
-      // if we succuessfully evaluated the image with a PASS than we don't need the $BUILD_ID tag anymore
       steps {
-        // if we want to promote the image, this would be a good spot to do it.
         //
-        // don't need the image anymore so let's rm it
+        // don't need the image(s) anymore so let's rm it
         //
-        // also let's tar up the generated json and archive it.
         sh 'docker image rm ${REPOSITORY}:${TAG} ${REPOSITORY}:${BRANCH_NAME} || failure=1'
+        // the || failure=1 just allows us to continue even if one or both of the tags we're
+        // rm'ing doesn't exist (e.g. if the evaluation failed, we might end up here without 
+        // re-tagging the image, so ${BRANCH_NAME} wouldn't exist.
         //
         // if we used anchore-cli above, we should probably use the plugin here to archive the evaluation
         // and generate the report:
