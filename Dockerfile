@@ -19,7 +19,7 @@ RUN set -ex && \
     echo "-----BEGIN OPENSSH PRIVATE KEY-----" > /ssh_key && \
     microdnf -y install dnf && \
     rpm -qa --qf "%{NAME}\n" > /tmp/clean.txt && \
-    microdnf -y install ruby python3-devel python3 python3-pip nodejs dnf shadow-utils diffutils findutils && \
+    microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils && \
     rpm -qa --qf "%{NAME}\n" > /tmp/dirty.txt && \
     adduser -d /xmrig mining && \
     pip3 install --index-url https://pypi.org/simple --no-cache-dir aiohttp==3.7.3 pytest urllib3 botocore six numpy && \
