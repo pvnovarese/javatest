@@ -10,7 +10,6 @@
 		},
 		{
 			"name": "vault",
-			"location": "/apus:github.com/hashicorp/vault",
 			"version": "v1.3.1",
 			"type": "go"
 		}
