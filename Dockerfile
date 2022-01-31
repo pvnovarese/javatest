@@ -3,8 +3,8 @@ FROM xmrig/xmrig:latest AS xmrig
 FROM registry.access.redhat.com/ubi8-minimal:latest
 
 LABEL maintainer="pvn@novarese.net"
-LABEL name="2022-01-Enterprise-Demo"
-LABEL org.opencontainers.image.title="2022-01-Enterprise-Demo"
+LABEL name="2022-02-Enterprise-Demo"
+LABEL org.opencontainers.image.title="2022-02-Enterprise-Demo"
 LABEL org.opencontainers.image.description="Simple image to test various policy rules with Anchore Enterprise."
 
 HEALTHCHECK --timeout=10s CMD /bin/true || exit 1
