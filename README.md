@@ -1,6 +1,7 @@
 # 2022-02-enterprise-demo
 
 [![Anchore Enterprise](https://github.com/pvnovarese/2022-02-enterprise-demo/actions/workflows/anchore-enterprise.yaml/badge.svg)](https://github.com/pvnovarese/2022-02-enterprise-demo/actions/workflows/anchore-enterprise.yaml) [![Anchore Weekly](https://github.com/pvnovarese/2022-02-enterprise-demo/actions/workflows/anchore-weekly.yaml/badge.svg)](https://github.com/pvnovarese/2022-02-enterprise-demo/actions/workflows/anchore-weekly.yaml)
+[![Build Status](http://0a71-18-191-156-75.ngrok.io/api/badges/pvnovarese/2022-02-enterprise-demo/status.svg)](http://0a71-18-191-156-75.ngrok.io/pvnovarese/2022-02-enterprise-demo)
 
 Simple demo for Anchore Enterprise, including both Jenkins and GitHub workflow examples.
 
