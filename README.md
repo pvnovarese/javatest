@@ -4,7 +4,7 @@
 
 Simple demo for Anchore Enterprise, including both Jenkins and GitHub workflow examples.
 
-Sample of problems in this image:
+Partial list of problems in this image:
 
 1. xmrig cryptominer installed at `/xmrig/xmrig`
 2. simulated AWS access key in `/aws_access`
