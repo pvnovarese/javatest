@@ -19,17 +19,22 @@ RUN set -ex && \
     echo "-----BEGIN OPENSSH PRIVATE KEY-----" > /ssh_key && \
     microdnf -y install dnf && \
     rpm -qa --qf "%{NAME}\n" > /tmp/clean.txt && \
-    microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils && \
+    microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils maven unzip wget && \
     rpm -qa --qf "%{NAME}\n" > /tmp/dirty.txt && \
     adduser -d /xmrig mining && \
     pip3 install --index-url https://pypi.org/simple --no-cache-dir aiohttp==3.7.3 pytest urllib3 botocore six numpy && \
     gem install ftpd -v 0.2.1 && \
     npm install --cache /tmp/empty-cache xmldom@0.4.0 && \
     npm cache clean --force && \
+    wget https://github.com/spring-cloud/spring-cloud-function/archive/refs/tags/v3.1.6.zip && \
+	unzip v3.1.6.zip && \
+	cd spring-cloud-function-3.1.6/spring-cloud-function-samples/function-sample-pojo && \
+	mvn package && \
+    cd / && \
     diff /tmp/clean.txt /tmp/dirty.txt | grep "^>" | awk '{ print $2 }' | xargs dnf -y remove && \
     dnf -y autoremove && \
     dnf -y clean all && \
-    rm -rf /var/cache/yum /tmp
+    rm -rf /var/cache/yum /tmp /spring-cloud-function-3.1.6
 
 ## if using the actual rpm rather than the hints file, you need these:
 ##    yum -y install /sudo-1.8.29-5.el8.x86_64.rpm && \
