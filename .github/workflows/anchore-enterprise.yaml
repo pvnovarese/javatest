@@ -52,6 +52,7 @@ jobs:
         sudo apt-get install python3-pip
         pip install anchorecli
         export PATH="$HOME/.local/bin/:$PATH"
+        anchore-cli registry add ghcr.io ${GITHUB_ACTOR} ${{ secrets.GITHUB_TOKEN }}
     - name: Add to Enterprise Queue
       run: | 
         anchore-cli image add --noautosubscribe --dockerfile ./Dockerfile ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}
