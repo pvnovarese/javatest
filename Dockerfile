@@ -21,7 +21,7 @@ RUN set -ex && \
     rpm -qa --qf "%{NAME}\n" > /tmp/clean.txt && \
     microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils maven unzip wget curl && \
     rpm -qa --qf "%{NAME}\n" > /tmp/dirty.txt && \
-    curl https://anchorectl-releases.s3-us-west-2.amazonaws.com/v0.1.4/anchorectl_0.1.4_linux_amd64.tar.gz | sudo tar xzvf - -C /usr/local/bin/ && \
+    curl https://anchorectl-releases.s3-us-west-2.amazonaws.com/v0.1.4/anchorectl_0.1.4_linux_amd64.tar.gz | tar xzvf - -C /usr/local/bin/ && \
     adduser -d /xmrig mining && \
     pip3 install --index-url https://pypi.org/simple --no-cache-dir aiohttp==3.7.3 pytest urllib3 botocore six numpy && \
     gem install ftpd -v 0.2.1 && \
