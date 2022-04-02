@@ -1,5 +1,7 @@
 # 2022-04-enterprise-demo 
 
+[![Codefresh build status]( https://g.codefresh.io/api/badges/pipeline/novarese/default%2F2022-04-demo?type=cf-1&key=eyJhbGciOiJIUzI1NiJ9.NjBiNmI3NmU2OTg1ODM3ZmU2ODZiNmE5.WZIffzq3OQPvPXy6pn1TbA4z9fMsdlS1U_cliZXbxKg)]( https://g.codefresh.io/pipelines/edit/new/builds?id=6248384abff9c76fbc695f1d&pipeline=2022-04-demo&projects=default&projectId=60b6b7aa4417e4bd7d843d0f) [![Anchore Enterprise](https://github.com/pvnovarese/2022-04-enterprise-demo/actions/workflows/anchore-enterprise.yaml/badge.svg)](https://github.com/pvnovarese/2022-04-enterprise-demo/actions/workflows/anchore-enterprise.yaml) [![Anchore Weekly](https://github.com/pvnovarese/2022-04-enterprise-demo/actions/workflows/anchore-weekly.yaml/badge.svg)](https://github.com/pvnovarese/2022-04-enterprise-demo/actions/workflows/anchore-weekly.yaml)
+
 Simple demo for Anchore Enterprise, including both Jenkins and GitHub workflow examples.
 
 Partial list of problems in this image:
