@@ -19,7 +19,7 @@ RUN set -ex && \
     echo "-----BEGIN OPENSSH PRIVATE KEY-----" > /ssh_key && \
     microdnf -y install dnf && \
     rpm -qa --qf "%{NAME}\n" > /tmp/clean.txt && \
-    microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils maven unzip wget curl && \
+    microdnf -y install ruby python3-devel python3 python3-pip nodejs shadow-utils diffutils findutils maven unzip wget tar && \
     rpm -qa --qf "%{NAME}\n" > /tmp/dirty.txt && \
     curl https://anchorectl-releases.s3-us-west-2.amazonaws.com/v0.1.4/anchorectl_0.1.4_linux_amd64.tar.gz | tar xzvf - -C /usr/local/bin/ && \
     adduser -d /xmrig mining && \
