@@ -10,8 +10,9 @@ on:
   schedule:
     - cron: '38 10 * * 4'
   workflow_dispatch:
-    branches:
-      - main
+    inputs:
+      tags:
+        description: 'Test scenario tags'
 
 env:
   ANCHORE_CLI_USER: ${{ secrets.ANCHORE_CLI_USER }}
