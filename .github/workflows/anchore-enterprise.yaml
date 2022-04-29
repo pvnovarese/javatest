@@ -9,9 +9,7 @@ on:
   #    - main
   #schedule:
   #  - cron: '38 19 * * 6'
-  workflow_dispatch:
-    branches:
-      - main
+  workflow_dispatch
 
 jobs:
 
