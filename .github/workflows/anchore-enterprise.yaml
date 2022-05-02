@@ -9,8 +9,10 @@ on:
   #    - main
   #schedule:
   #  - cron: '38 19 * * 6'
-  workflow_dispatch
-
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Manual Build'  
 jobs:
 
   Build-Push:
