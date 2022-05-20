@@ -1,0 +1,17 @@
+{
+	"packages": [
+		{
+			"name": "log4j-core",
+			"version": "2.14.1",
+			"license": "Apache 2",
+			"type": "java"
+		},
+		{
+			"name": "github.com/hashicorp/vault",
+			"version": "v1.3.1",
+			"location": "/apus:github.com/hashicorp/vault",
+			"license": "MPLv2.0",
+			"type": "go"
+		}
+	]
+}
